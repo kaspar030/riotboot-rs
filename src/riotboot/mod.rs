@@ -1,8 +1,9 @@
-use super::fletcher::fletcher32::Fletcher32;
-use cortex_m_semihosting::{dbg, hprintln};
+extern crate fletcher;
+//use cortex_m_semihosting::{dbg, hprintln};
+use fletcher::Fletcher32;
 
 /// "RIOT"
-const RIOTBOOT_MAGIC: u32 = 0x544f4952;
+const RIOTBOOT_MAGIC: u32 = 0x544f_4952;
 
 /// struct defining riotboot header
 #[derive(Debug)]

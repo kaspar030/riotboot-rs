@@ -9,7 +9,6 @@ use cortex_m_semihosting::hprintln;
 use nrf52840_hal::gpio::Level;
 use particle_xenon::{prelude::*, Board};
 
-pub mod fletcher;
 mod riotboot;
 use riotboot::{choose_image, Header};
 
@@ -17,17 +16,12 @@ use riotboot::{choose_image, Header};
 pub extern "C" fn cpu_jump_to_image(image_address: u32) -> ! {
     unsafe {
         asm!("
-    /* r1 = *image_address      */
-    ldr    r1, [$0]
-    /* MSP = r1                 */
-    msr msp, r1
-    /* r0 = *(image_address + 4) */
-    ldr    $0, [$0, #4]
-    /* r0 |= 0x1 (set thumb bit) */
-    orr.w   $0, $0, #1
-    /* branch to image */
-    bx $0
-    "
+    ldr     r1, [$0]        /* r1 = *image_address          */
+    msr     msp, r1         /* MSP = r1                     */
+    ldr     $0, [$0, #4]    /* r0 = *(image_address + 4)    */
+    orr.w   $0, $0, #1      /* r0 |= 0x1 (set thumb bit)    */
+    bx      $0              /* branch to image              */
+        "
         :
         : "{r0}"(image_address)
         : "r0"
@@ -39,7 +33,7 @@ pub extern "C" fn cpu_jump_to_image(image_address: u32) -> ! {
 
 #[entry]
 fn main() -> ! {
-    let headers = unsafe { [&*(0x2000 as *const Header), &*(528384 as *const Header)] };
+    let headers = unsafe { [&*(0x2000 as *const Header), &*(528_384 as *const Header)] };
     let image = choose_image(&headers[..]);
 
     if let Some(image_address) = image {

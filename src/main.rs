@@ -1,13 +1,11 @@
 #![no_main]
 #![no_std]
-#![feature(asm)]
+#![feature(llvm_asm)]
 
 extern crate panic_halt;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
-use nrf52840_hal::gpio::Level;
-use particle_xenon::{prelude::*, Board};
 
 mod riotboot;
 use riotboot::{choose_image, Header};
@@ -15,7 +13,7 @@ use riotboot::{choose_image, Header};
 #[cfg(all(target_arch = "arm", target_os = "none"))]
 pub extern "C" fn cpu_jump_to_image(image_address: u32) -> ! {
     unsafe {
-        asm!("
+        llvm_asm!("
     ldr     r1, [$0]        /* r1 = *image_address          */
     msr     msp, r1         /* MSP = r1                     */
     ldr     $0, [$0, #4]    /* r0 = *(image_address + 4)    */

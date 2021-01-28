@@ -43,21 +43,22 @@ impl Header {
 }
 
 pub fn choose_image(images: &[&Header]) -> Option<u32> {
-    let mut image: Option<u32> = None;
+    let mut image: Option<&Header> = None;
 
     for header in images {
         if header.is_valid() {
             if let Some(image) = image {
-                if header.sequence_number <= image {
+                if header.sequence_number <= image.sequence_number {
                     continue;
                 }
             }
             //hprintln!("found image").unwrap();
             //hprintln!("valid image address: {:#08x}", header.start_addr).unwrap();
-            image = Some(header.start_addr)
+            image = Some(header)
         }
     }
-    image
+
+    image.map_or(None, |x| Some(x.start_addr))
 }
 
 // #![test]

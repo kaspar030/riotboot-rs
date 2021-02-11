@@ -1,6 +1,5 @@
-extern crate fletcher;
 //use cortex_m_semihosting::{dbg, hprintln};
-use fletcher::Fletcher32;
+use fletcher::fletcher32::Fletcher32;
 
 /// "RIOT"
 const RIOTBOOT_MAGIC: u32 = 0x544f_4952;

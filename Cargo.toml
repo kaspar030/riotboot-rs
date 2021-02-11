@@ -12,9 +12,18 @@ cortex-m = "0.7.1"
 cortex-m-rt = "0.6.13"
 cortex-m-semihosting = "0.3.7"
 
-fletcher = { git = "https://github.com/jbangelo/fletcher" }
+#fletcher = { optional=true, git = "https://github.com/jbangelo/fletcher" }
+fletcher = { optional=true, path = "/home/kaspar/src/fletcher" }
+#hacspec-riot-bootloader = { optional = true, git= "https://github.com/hacspec/hacspec" }
+hacspec-riot-bootloader = { optional = true, path="/home/kaspar/src/hacspec/examples/riot-bootloader" }
+hacspec-lib = { optional = true, path="/home/kaspar/src/hacspec/lib", default-features = false }
+static-alloc = { optional=true, version = "0.2.2" }
 
 # this lets you use `cargo fix`!
+[features]
+internal = ["fletcher"]
+verified = ["hacspec-lib/alloc", "hacspec-riot-bootloader", "static-alloc"]
+
 [[bin]]
 name = "riotboot-rs"
 test = false

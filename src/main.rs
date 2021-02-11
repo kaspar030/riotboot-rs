@@ -1,13 +1,51 @@
 #![no_main]
 #![no_std]
 #![feature(llvm_asm)]
+#![cfg_attr(feature = "verified", feature(default_alloc_error_handler))]
 
 extern crate panic_halt;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting::hprintln;
 
+#[cfg(not(feature = "verified"))]
 mod riotboot;
+
+#[cfg(not(feature = "verified"))]
+extern crate fletcher;
+
+// HACKSPEC specifics start
+#[cfg(feature = "verified")]
+extern crate alloc;
+
+#[cfg(feature = "verified")]
+mod riotboot {
+    use alloc::vec::Vec;
+
+    pub use hacspec_lib::seq::Seq;
+    pub use hacspec_riot_bootloader::Header;
+
+    pub fn choose_image(images: &[&Header]) -> Option<u32> {
+        let images = images.iter().map(|x| **x).collect::<Vec<_>>();
+        let images = Seq::from_vec(images);
+        let (have, addr) = hacspec_riot_bootloader::choose_image(images);
+        if have {
+            Some(addr)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(feature = "verified")]
+use static_alloc::Bump;
+
+#[cfg(feature = "verified")]
+#[global_allocator]
+static A: Bump<[u8; 1 << 14]> = Bump::uninit();
+
+// HACKSPEC specifics end
+
 use riotboot::{choose_image, Header};
 
 #[cfg(all(target_arch = "arm", target_os = "none"))]
